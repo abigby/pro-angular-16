@@ -6,11 +6,16 @@
       width: 100,
       cellRenderer: ToolTipComponent,
       cellRendererParams: (params:any) => {
-        console.log('CIK: ', params.data.sub_cik.toLocaleString());
-        if(params.data.sub_cik !== undefined && params.data.sub_cik !== null) {
-          return params.data.sub_cik.toLocaleString();
+        const formattedValue = params.data.sub_cik.toLocaleString();
+        return {
+          content: formattedValue,
+          type: { 
+            value: formattedValue,
+            toolTip: {
+              value: `Central Index Key: ${formattedValue}`
+            }
+          }
         }
-        return '';
       }
     },
     {
@@ -18,16 +23,24 @@
       hide: true,
       field: 'sub_aciks',
       filter: 'agTextColumnFilter',
-
       width: 200,
       cellRenderer: ToolTipComponent,
       cellRendererParams: (params:any) => {
-        if(params.data.sub_cik !== undefined && params.data.sub_cik !== null) {
-          return params.data.sub_cik.toLocaleString();
+        const formattedValue = params.data.sub_aciks
+        .map((cik:number) => cik.toLocaleString())
+        .join(', ');
+
+        return {
+          content: formattedValue,
+          type: { 
+            value: formattedValue,
+            toolTip: {
+              value: `Additional Central Index Key: ${formattedValue}`
+            }
+          }
         }
-        return '';
       }
-    }
+    },
 
 <mat-form-field appearance="outline" [class]="class">
       <mat-label>{{ label }}</mat-label>
