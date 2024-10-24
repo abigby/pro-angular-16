@@ -1,8 +1,33 @@
-I’ve been working on the implementation for XDR-475 and have encountered an issue. Whenever I attempt to open any file, I receive an error, and it seems like the entire file system is unresponsive within the EC2 environment. While I am able to log in to the terminal successfully, I am unable to perform any actions after that point.
+{
+      headerName: 'CIK',
+      filter: 'agTextColumnFilter',
+      hide: true,
+      field: 'sub_cik',
+      width: 100,
+      cellRenderer: ToolTipComponent,
+      cellRendererParams: (params:any) => {
+        console.log('CIK: ', params.data.sub_cik.toLocaleString());
+        if(params.data.sub_cik !== undefined && params.data.sub_cik !== null) {
+          return params.data.sub_cik.toLocaleString();
+        }
+        return '';
+      }
+    },
+    {
+      headerName: 'Additional CIKs',
+      hide: true,
+      field: 'sub_aciks',
+      filter: 'agTextColumnFilter',
 
-Could you provide any updates on what steps are being taken to resolve the environment issues? This has been significantly affecting our ability to work efficiently, and any insights or timelines for resolution would be greatly appreciated.
-
-Thank you for your assistance.
+      width: 200,
+      cellRenderer: ToolTipComponent,
+      cellRendererParams: (params:any) => {
+        if(params.data.sub_cik !== undefined && params.data.sub_cik !== null) {
+          return params.data.sub_cik.toLocaleString();
+        }
+        return '';
+      }
+    }
 
 <mat-form-field appearance="outline" [class]="class">
       <mat-label>{{ label }}</mat-label>
