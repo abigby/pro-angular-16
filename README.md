@@ -1,18 +1,5 @@
- years = [
-    { viewValue: '2023', value: '2023' },
-    { viewValue: '2022', value: '2022' },
-    { viewValue: '2021', value: '2021' },
-    { viewValue: '2020', value: '2020' },
-    { viewValue: '2019', value: '2019' },
-    { viewValue: '2018', value: '2018' },
-    { viewValue: '2017', value: '2017' },
-    { viewValue: '2016', value: '2016' },
-    { viewValue: '2015', value: '2015' },
-    { viewValue: '2014', value: '2014' },
-    { viewValue: '2013', value: '2013' },
-    { viewValue: '2012', value: '2012' },
-    { viewValue: '2011', value: '2011' },
-    { viewValue: '2010', value: '2010' },
-    { viewValue: '2009', value: '2009' },
-    { viewValue: '2008', value: '2008' },
-  ];
+filing-component.component.html:8 ERROR Error: Value must be an array in multiple-selection mode.
+
+      this._value = v;
+      this.itemVal.setValue(this._value);
+      this.updateVal(v);
