@@ -46,7 +46,9 @@ filing.component.html:
         label="Period"
         [multiple]="true"
       ></idap-select>
-    </div>filing-component.component.html:8 ERROR TypeError: selectedValue.forEach is not a function
+    </div>
+
+filing-component.component.html:8 ERROR TypeError: selectedValue.forEach is not a function
     at _SelectComponent.getItemDisplayStringForSelectedValue (select.component.ts:173:21)
 
     if (selectedValue && this.isFormattedMultiSelectDisplay) {
@@ -336,6 +338,107 @@ export class SelectComponent implements OnInit, OnChanges, ControlValueAccessor 
   }
 }
 
+
+filing-component.component.html: 
+<div role="group" [attr.aria-labelledby]="headerID">
+
+  <div class="filter-group-header">
+    <div>
+      <h4 [attr.id]="headerID">{{ tabName === 'fact' ? 'Data' : 'Filings' }}</h4>
+    </div>
+    <a mat-stroked-button
+      (click)="clear()"
+      matTooltip="Reset Filings filters to their default.">
+      Reset
+    </a>
+  </div>
+  <form [formGroup]="filingForm">
+    <div class="flex flex-justify-between">
+      <idap-select
+        [items]="years"
+        [isFormattedMultiSelectDisplay]="true"
+        formControlName="fiscal_year"
+        label="Year"
+        [multiple]="true"
+        [class]="'w-100'"
+        class="w-100 mr-8"
+      ></idap-select>
+      <idap-select
+        [items]="periods"
+        [isFormattedMultiSelectDisplay]="true"
+        [selectAllIsDefault]="true"
+        formControlName="fiscal_period"
+        [class]="'w-100'"
+        class="w-100"
+        label="Period"
+        [multiple]="true"
+      ></idap-select>
+    </div>
+    <div class="flex justify-between">
+      <mat-slide-toggle
+        class="mb-16"
+        (change)="toggleContent()"
+        matTooltip="{{
+          showMore
+            ? 'Click to minimize more search options'
+            : 'Expand for more search options'
+        }}"
+      >See {{ showMore ? 'less' : 'more' }}</mat-slide-toggle
+      >
+    </div>
+    @if (showMore) {
+      <div class="flex">
+        <idap-datepicker
+          formControlName="date_filed"
+          label="Filed"
+          hint="MM-DD-YYYY"
+          matTooltip="Filing Date Range From"
+          class="mr-8"
+          #date_filed
+          [disabled]="searchingRecent()"
+        ></idap-datepicker>
+        <idap-datepicker
+          formControlName="date_to"
+          label="To"
+          hint="MM-DD-YYYY"
+          matTooltip="Filing Date Range To"
+          #date_to
+          [disabled]="searchingRecent()"
+        ></idap-datepicker>
+      </div>
+      <div class="flex flex-items-center">
+        <idap-select
+          label="Form"
+          placeholder="Form"
+          formControlName="sub_form"
+          [items]="forms"
+          [multiple]="true"
+          [selectAllIsDefault]="true"
+          [isFormattedMultiSelectDisplay]="true"
+          #sub_form
+          class="m-r-4"
+          >
+        </idap-select>
+        <idap-checkbox
+          formControlName="include8k"
+          tooltip="Results include 8-K filings without financial statements"
+          class="pb3"
+          >Include 8-K Cover Pages</idap-checkbox
+          >
+        </div>
+        @if (tabName === 'filing') {
+          <div class="flex">
+            <div></div>
+            <idap-checkbox
+              formControlName="recent"
+              tooltip="Returns only the most recent filings for the filer population (overriding any date and period filters)."
+              >Most Recent</idap-checkbox
+              >
+            </div>
+          }
+        }
+      </form>
+</div>
 
 filing-component.component.html:8 ERROR Error: Value must be an array in multiple-selection mode.
     at getMatSelectNonArrayValueError (select.mjs:137:10)
