@@ -1,5 +1,15 @@
 filing.component.ts:
- 
+
+   filingForm = this.fb.group({
+    fiscal_year: new UntypedFormControl([this.currentYear]),
+    fiscal_period: new UntypedFormControl(''),
+    date_filed: new UntypedFormControl(''),
+    date_to: new UntypedFormControl(''),
+    sub_form: new UntypedFormControl(''),
+    include8k: new UntypedFormControl(''),
+    recent: new UntypedFormControl(false),
+  });
+  
   public reset() {
     this.filingForm.reset();
   }
