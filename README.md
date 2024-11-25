@@ -335,3 +335,16 @@ export class SelectComponent implements OnInit, OnChanges, ControlValueAccessor 
     return this.displayTextForMatTrigger = '';
   }
 }
+
+
+filing-component.component.html:8 ERROR Error: Value must be an array in multiple-selection mode.
+    at getMatSelectNonArrayValueError (select.mjs:137:10)
+    at _MatSelect._setSelectionByValue (select.mjs:799:15)
+    at _MatSelect._assignValue (select.mjs:849:14)
+    at _MatSelect.writeValue (select.mjs:620:10)
+    at onChange (forms.mjs:3373:23)
+    at forms.mjs:3871:42
+    at Array.forEach (<anonymous>)
+    at FormControl2.setValue (forms.mjs:3871:22)
+    at set value (select.component.ts:118:18)
+    at _SelectComponent.writeValue (select.component.ts:129:10)
