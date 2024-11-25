@@ -149,7 +149,105 @@ select.component.html:
     </mat-form-field>
 
 select.component.ts: 
-public set value(v) {
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  forwardRef,
+  OnInit,
+  ViewChild,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
+import {
+  ControlValueAccessor,
+  UntypedFormControl,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
+import { MatSelect } from '@angular/material/select';
+
+@Component({
+  selector: 'idap-select',
+  styles: [
+    `
+              /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+              /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+              ::ng-deep idap-select .mat-form-field-infix {
+                width: auto !important;
+                min-width: 154px;
+              }
+            `,
+  ],
+  templateUrl: './select.component.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SelectComponent),
+      multi: true,
+    },
+  ],
+})
+export class SelectComponent implements OnInit, OnChanges, ControlValueAccessor {
+  @Input() disabled = false;
+  @Input() label = '';
+  @Input() items = <any>[];
+  @Input() multiple = false;
+  @Input('class') customClass!:string;
+  @Input() group = false;
+  @Input() resetsGridOnValueChange: boolean = false;
+  @Input() isFormattedMultiSelectDisplay: boolean = false;
+  @ViewChild('select') select!: MatSelect;
+  @Input() set selectAllIsDefault(value: boolean) {
+    if (value) {
+      setTimeout(() => {
+        this.select.open();
+        this.toggleSelections(true);
+        this.select.close();
+      }, 0);
+    }
+  }
+
+  _value: any = null;
+  itemVal = new UntypedFormControl('');
+  selectAll = false;
+  displayTextForMatTrigger = '';
+  selectedItemsTooltipText: string = '';
+
+  @Output() onselect = new EventEmitter<any>();
+  @Output() resetGrid = new EventEmitter<any>();
+
+  ngOnChanges(changes: SimpleChanges): void { }
+
+  ngOnInit(): void { }
+
+  updateVal(val: any) {
+    this.getItemDisplayStringForSelectedValue(val);
+    if(this.resetsGridOnValueChange){
+      this.resetGrid.emit({resetGrid:true, value: val});
+    }
+    
+    //sometimes string value length matches items length
+    // and incorrectly triggers the selectAll
+    if (val && typeof val !== 'string' && val.length === this.items.length) this.selectAll = true;
+    else this.selectAll = false;
+  }
+  onChange = (val: any) => {
+    this.onselect.emit(val);
+  };
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  onTouched = () => {};
+
+  onKeyUp(value: any) {
+    //this.onkeyup.emit(value);
+    //this.writeValue(value);
+  }
+
+  public get value(): any {
+    return this._value;
+  }
+
+  public set value(v) {
 
     //Reset checkboxes for 'form' field to checked if select all was submitted
     if(this.selectAll && this.label === 'Form'){
@@ -160,13 +258,70 @@ public set value(v) {
       }, 0);
     }
 
-    
-    // if(this.label.toLowerCase() === "year") {
-    //   this._value = [v];
-    // } else {
-      this._value = v;
-    // }
-
+    this._value = v;
     this.itemVal.setValue(this._value);
-    this.updateVal(this._value);
+    this.updateVal(v)
   }
+
+  public clear() {
+    this.value = '';
+    this.itemVal.setValue('');
+  }
+
+  writeValue(s: any): void {
+    this.value = s ?? '';
+    this.onChange?.(this.value);
+  }
+  registerOnChange(fn: (val: any) => void): void {
+    this.onChange = fn;
+  }
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+
+  toggleSelections(toggle: any): void {
+    this.selectAll = toggle;
+    //update UI to check all boxes, but submit blank value to server
+    if(toggle && this.label === 'Form'){
+      this._value = this.items.map((item: any) => item.value);
+      this.itemVal.setValue(this._value);
+      this.onChange([]);
+
+    } else if (toggle && this.label !== 'Form') {
+      this._value = this.items.map((item: any) => item.value);
+      this.itemVal.setValue(this._value);
+      this.onChange(this._value);
+    } else {
+      this._value = <any>[];
+      this.itemVal.setValue(this._value);
+      this.onChange(this._value);
+    }
+  }
+
+  //Throws a afterViewCheckedError after the form is saved.
+  // but error doesn't cause any issues, currently no other work around - TM
+  getItemDisplayStringForSelectedValue(selectedValue: any) {
+    if (selectedValue && this.isFormattedMultiSelectDisplay) {
+      let seletectItems: any = [];
+      let selectedItemsTooltipText: any = [];
+      selectedValue.forEach((value: any) => {
+        let item = this.items.find((item: any) => item.value === value);
+        seletectItems.push(item);
+      });
+      if (selectedValue.length > 1 && this.isFormattedMultiSelectDisplay && selectedValue.length !== this.items.length) {
+        this.displayTextForMatTrigger = seletectItems[0].viewValue;
+        seletectItems.forEach((value: any) => {
+          selectedItemsTooltipText.push(value.viewValue);
+        });
+        this.selectedItemsTooltipText = String(
+          selectedItemsTooltipText
+        ).replace(/,/g, ', ');
+        return this.displayTextForMatTrigger
+      } else {
+        this.displayTextForMatTrigger = '';
+        return this.displayTextForMatTrigger = '';
+       } 
+    }
+    return this.displayTextForMatTrigger = '';
+  }
+}
