@@ -1,54 +1,76 @@
-Write unite tests to ensure the menu item renders correctly.
-Write integration tests to verify that clicking the menu item routes the user to the My groups home/landing page. 
-Conduct cross-browser and responsive testing to confirm the menu item functions correctly on all supported devices and platforms. 
+
+// menu-item.component.spec.ts
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { RouterTestingModule } from '@angular/router/testing';
+import { MenuComponent } from './menu.component';
+
+describe('MenuComponent', () => {
+  let component: MenuComponent;
+  let fixture: ComponentFixture<MenuComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [MenuComponent],
+      imports: [MatSidenavModule, MatListModule, RouterTestingModule]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(MenuComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should render the "My Groups" menu item', () => {
+    const compiled = fixture.nativeElement;
+    const menuItem = compiled.querySelector('mat-list-item[routerLink="my-groups"]');
+    expect(menuItem).toBeTruthy();
+    expect(menuItem.textContent.trim()).toBe('My Groups');
+  });
+});
 
 
-      <mat-sidenav-container [hasBackdrop]="true" class="bg-white">
-        <mat-sidenav class="w-25" mode="over" [opened]="ui.sideNavOpen | async">
-          <mat-nav-list class="">
-            <mat-list-item routerLink="my-profile">My Profile</mat-list-item>
-            <mat-list-item routerLink="predef-query">Predefined Queries</mat-list-item>
-            <mat-list-item routerLink="xbrl-summary">XBRL Submission Analysis</mat-list-item>
-            <mat-list-item routerLink="my-groups">My Groups</mat-list-item>
-            <mat-list-item>Save Query</mat-list-item>
-            <mat-list-item>Upload Query</mat-list-item>
-            <mat-list-item>Fact Notes Report</mat-list-item>
-            <mat-divider></mat-divider>
-            <h3 matSubheader>Other Applications</h3>
-            <mat-list-item>
-              <a style="text-decoration: none !important"
-                  href="{{ aaqvURL }}"
-                  target="_blank"
-                  rel="noopener">
-                AAQV
-              </a></mat-list-item>
-            <mat-list-item>
-              <a style="text-decoration: none !important"
-                        href="{{ iViewURL }}"
-                        target="_blank"
-                        rel="noopener">
-                iView
-              </a>
-            </mat-list-item>
-            <mat-list-item>
-              <a style="text-decoration: none !important"
-                        href="{{ fpURL }}"
-                        target="_blank"
-                        rel="noopener">
-                Filer Profile
-                </a>
-            </mat-list-item>
-            <mat-list-item>
-              <a style="text-decoration: none !important"
-                        href="{{ usGaapURL }}"
-                        target="_blank"
-                        rel="noopener">
-                US-GAAP Viewer
-              </a>
-            </mat-list-item>
-    </mat-nav-list>
-  </mat-sidenav>
-   <mat-sidenav-content>
-     <router-outlet></router-outlet>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+// menu-item-routing.spec.ts
+
+import { TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { Router } from '@angular/router';
+import { Location } from '@angular/common';
+import { MenuComponent } from './menu.component';
+import { MyGroupsComponent } from '../my-groups/my-groups.component';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+
+describe('Menu Routing', () => {
+  let router: Router;
+  let location: Location;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [MenuComponent, MyGroupsComponent],
+      imports: [
+        RouterTestingModule.withRoutes([
+          { path: 'my-groups', component: MyGroupsComponent }
+        ]),
+        MatSidenavModule,
+        MatListModule
+      ]
+    }).compileComponents();
+
+    router = TestBed.inject(Router);
+    location = TestBed.inject(Location);
+    router.initialNavigation();
+  });
+
+  it('should navigate to "My Groups" when menu item is clicked', async () => {
+    const fixture = TestBed.createComponent(MenuComponent);
+    const compiled = fixture.nativeElement;
+    const menuItem = compiled.querySelector('mat-list-item[routerLink="my-groups"]');
+
+    menuItem.click();
+    await fixture.whenStable(); // Wait for the router to update.
+
+    expect(location.path()).toBe('/my-groups');
+  });
+});
